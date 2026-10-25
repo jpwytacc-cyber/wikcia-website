@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #17181D;
+  --color-porcelain: #F4EFE7;
+  --color-citron: #D8FF85;
+  --color-orchid: #A993F7;
+  --color-silver: #a9b0b8;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-interface: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-ink text-porcelain antialiased selection:bg-citron selection:text-ink;
+    font-family: var(--font-interface);
+  }
+  h1, h2, h3, h4, .font-display {
+    font-family: var(--font-display);
+  }
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+}
+
+@layer components {
+  .section {
+    @apply py-20 px-6 md:px-12 lg:px-24;
+  }
+  .container {
+    @apply max-w-7xl mx-auto;
+  }
+  .section-header {
+    @apply mb-16 text-center;
+  }
+  .section-header h2 {
+    @apply text-4xl md:text-6xl font-bold text-porcelain mb-4 tracking-tight;
+  }
+  .section-header p {
+    @apply text-xl text-silver max-w-2xl mx-auto;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all duration-300;
+  }
+  .btn-primary {
+    @apply bg-citron text-ink hover:bg-citron/90 hover:-translate-y-1 hover:shadow-[0_20px_40px_-10px_rgba(216,255,133,0.4)];
+  }
+  .btn-secondary {
+    @apply border border-citron/30 text-citron hover:bg-citron/10 hover:-translate-y-1;
+  }
+  .btn-outline {
+    @apply border border-white/10 text-white hover:bg-white/5;
+  }
+  .card {
+    @apply bg-white/5 border border-white/10 rounded-2xl p-8 hover:border-citron/50 transition-all duration-300;
+  }
+  .glass {
+    @apply bg-white/5 backdrop-blur-md border border-white/10;
+  }
+}
+
+.silver-400 {
+  color: #a9b0b8;
+}
