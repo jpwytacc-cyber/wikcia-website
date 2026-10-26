@@ -5,14 +5,14 @@ export const projects = [
 ];
 
 export const capabilities = [
- { name: 'Creative direction', category: 'Create', detail: 'Turn a brief into an identity, a visual language and a coherent digital experience.', tools: 'Art direction · Brand systems · UX' },
+ { name: 'Marketing & creative direction', category: 'Create', detail: 'Turn a brief into an identity, a visual language and a coherent digital experience.', tools: 'Art direction · Brand systems · UX' },
  { name: 'Interactive experiences', category: 'Build', detail: 'Design and engineer tactile websites, spatial interfaces and original WebGL scenes.', tools: 'React · TypeScript · Three.js' },
  { name: 'Software development', category: 'Build', detail: 'Work across the interface, backend, tests and deployment—not just the first screen.', tools: 'Application code · APIs · Verification' },
  { name: 'Research & synthesis', category: 'Discover', detail: 'Find sources, compare evidence and turn an open question into a useful, traceable answer.', tools: 'Web research · Source extraction · Analysis' },
  { name: 'Workflow automation', category: 'Connect', detail: 'Connect applications, structure repeated work and keep consequential actions behind approval.', tools: 'Native tools · MCP · Scheduled workflows' },
  { name: 'Image & motion workflows', category: 'Create', detail: 'Orchestrate supported creative tools for image work, animation and media processing.', tools: 'ComfyUI · FFmpeg · Creative applications' },
  { name: 'Document intelligence', category: 'Discover', detail: 'Extract, organise and transform documents, spreadsheets and presentations into useful deliverables.', tools: 'PDF · Office documents · Structured data' },
- { name: 'Business systems', category: 'Connect', detail: 'Bring practical AI into research, content operations and internal workflows without losing human control.', tools: 'Process design · Reporting · Integrations' },
+ { name: 'Outreach preparation', category: 'Connect', detail: 'Research context and prepare relevant outreach drafts, keeping recipient choice, permission and real-world sending behind human review.', tools: 'Research · Drafting · Review · Authorised integrations' },
 ];
 
 export const workflowStories = [
@@ -23,7 +23,7 @@ export const workflowStories = [
 
 export const faqs = [
  ['What is Wikcia?', 'Wikcia is a creative and automation assistant. Wikcia Studio brings conversation, software work, research and connected tools into one operating environment. It is developed by Love & Pixels on a customised Hermes Agent foundation.'],
- ['Can I use the AI directly on this website?', 'This website is an interactive showcase, not a hosted AI chat service. The design playground creates SVG artwork locally using deterministic code. It does not send a prompt to an AI model. Contact the studio to discuss Wikcia Studio.'],
+ ['Can I use the AI directly on this website?', 'This website is an interactive showcase, not a hosted AI chat service. The product walkthrough is a prewritten, interactive example with fictional data. The design playground creates SVG artwork locally using deterministic code. This website does not send a prompt to an AI model, retrieve prospects or send outreach. Contact the studio to discuss Wikcia Studio.'],
  ['Is Wikcia a model?', 'No. Wikcia is an assistant and operating environment that can work with supported models and tools. The available capabilities depend on the installed applications, model configuration, credentials and permissions.'],
  ['Does local AI mean everything stays private?', 'Only work explicitly routed to a local model stays in that local inference path. A conversation using a cloud model is not made private by also having local models installed. Privacy depends on the entire workflow, including connected services.'],
  ['Will Wikcia take actions without asking?', 'Ordinary reversible work can be automated within an approved scope. Spending, sensitive security changes and important irreversible actions need explicit permission. Having an integration is not blanket authority to use it.'],

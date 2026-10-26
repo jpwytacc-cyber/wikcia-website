@@ -1,7 +1,7 @@
 .signal-scene {
-  --signal-paper: #f1f0e9;
-  --signal-ink: #17181d;
-  --signal-muted: #6c6c68;
+  --signal-paper: #202329;
+  --signal-ink: #f1f0e9;
+  --signal-muted: #bdc3b7;
   position: relative;
   width: 100%;
   min-width: 0;
@@ -9,6 +9,10 @@
   color: var(--signal-ink);
   isolation: isolate;
   font-family: inherit;
+  background: var(--signal-paper);
+  border: 1px solid #41474b;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .signal-scene__stage {
@@ -17,7 +21,15 @@
   height: clamp(370px, 36vw, 520px);
   min-height: 0;
   overflow: hidden;
+  touch-action: pan-y;
+  cursor: grab;
+  outline-offset: -5px;
 }
+
+.signal-scene__stage[data-dragging='true'] { cursor: grabbing; }
+.signal-scene__stage:focus-visible { outline: 2px solid #d8ff85; }
+.signal-scene__interaction-hint { position: absolute; z-index: 3; top: 22px; left: 22px; color: #d8ff85; font: 10px/1.5 ui-monospace,monospace; letter-spacing: .08em; pointer-events: none; }
+.signal-scene__interaction-hint > span { margin-left: 12px; font-size: 19px; }
 
 .signal-scene__canvas,
 .signal-scene__fallback {
@@ -63,7 +75,8 @@
   gap: 18px 16px;
   margin: 0 20px;
   padding: 17px 0 0;
-  border-top: 1px solid #17181d26;
+  border-top: 1px solid #7a81735c;
+  padding-bottom: 12px;
 }
 
 .signal-scene__description {
@@ -89,13 +102,14 @@
   flex-shrink: 0;
   align-items: center;
   gap: 5px;
+  flex-wrap: wrap;
 }
 
 .signal-scene__modes {
   display: flex;
   padding: 3px;
   margin-right: 4px;
-  border: 1px solid #17181d29;
+  border: 1px solid #8b938866;
   border-radius: 999px;
 }
 
@@ -121,11 +135,14 @@
   transition: color 160ms ease, background-color 160ms ease;
 }
 
-.signal-scene__controls button:hover { background: #17181d0b; }
-.signal-scene__controls button[aria-pressed='true'] { background: var(--signal-ink); color: var(--signal-paper); }
-.signal-scene__controls button[aria-pressed='true']:hover { background: #35363b; }
-.signal-scene__controls button:focus-visible { outline: 2px solid #665082; outline-offset: 4px; }
-.signal-scene__controls .signal-scene__icon-button { padding: 10px; }
+.signal-scene__controls button:hover { background: #7e827326; }
+.signal-scene__controls button[aria-pressed='true'] { background: #d8ff85; color: #17181d; }
+.signal-scene__controls button[aria-pressed='true']:hover { background: #ebffc4; }
+.signal-scene__controls button:focus-visible { outline: 2px solid #d8ff85; outline-offset: 2px; }
+.signal-scene__controls button:disabled { opacity: .45; cursor: default; }
+.signal-scene__instruction { margin: 0 20px; padding: 0 0 18px; color: #bdc3b7; font-size: 11px; line-height: 1.6; }
+.signal-scene__controls .signal-scene__icon-button { padding: 10px; border: 1px solid #8b938866; font-size: 21px; }
+.signal-scene__controls .signal-scene__icon-button[aria-label='Reset sculpture'] { font-size: 11px; padding-inline: 14px; }
 .signal-scene__icon-button svg { width: 20px; height: 20px; }
 
 .signal-scene__sr-only {
@@ -152,7 +169,10 @@
   .signal-scene__caption { align-items: flex-start; }
   .signal-scene__description { flex-basis: 100%; }
   .signal-scene__controls { width: 100%; }
-  .signal-scene__modes { margin-right: auto; }
+  .signal-scene__modes { margin-right: 0; flex: 1 0 100%; justify-content: center; margin-bottom: 5px; }
+  .signal-scene__modes button { flex: 1; }
+  .signal-scene__description { font-size: 11px; }
+  .signal-scene__instruction { margin-inline: 12px; font-size: 10px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

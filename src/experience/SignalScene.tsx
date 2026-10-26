@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
+import type { PointerEvent as ReactPointerEvent } from 'react';
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { createRibbonGeometry } from './signal-geometry';
@@ -6,7 +7,7 @@ import type { SculptureMode } from './signal-geometry';
 import './signal-scene.css';
 
 type SceneController = {
-  update: (mode: SculptureMode, rotation: number) => void;
+  update: (mode: SculptureMode, rotation: number, tilt: number, zoom: number) => void;
   reset: () => void;
 };
 
@@ -19,6 +20,10 @@ export default function SignalScene({ className = '' }: { className?: string }) 
   const controllerRef = useRef<SceneController | null>(null);
   const [mode, setMode] = useState<SculptureMode>('ribbon');
   const [rotation, setRotation] = useState(0);
+  const [tilt, setTilt] = useState(0);
+  const [zoom, setZoom] = useState(1);
+  const dragRef = useRef<{ id: number; x: number; y: number; rotation: number; tilt: number } | null>(null);
+  const turn = (value: number) => ((value % 360) + 360) % 360;
   const [rendererState, setRendererState] = useState<RendererState>('loading');
   const uid = `signal-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
 
@@ -35,6 +40,7 @@ export default function SignalScene({ className = '' }: { className?: string }) 
     let elapsed = 0;
     let currentAngle = 0;
     let targetAngle = 0;
+    let targetTilt = 0;
     let selected: SculptureMode = 'ribbon';
     let renderer: THREE.WebGLRenderer | undefined;
     let environmentTarget: THREE.WebGLRenderTarget | undefined;
@@ -62,7 +68,7 @@ export default function SignalScene({ className = '' }: { className?: string }) 
     };
     const canRender = () => prepared && !disposed && !contextLost && visible && !document.hidden && !!renderer;
     const pose = () => {
-      sculpture.rotation.set(0.12, -0.2 + currentAngle + (motion.matches ? 0 : Math.sin(elapsed * 0.3) * 0.07), -0.075);
+      sculpture.rotation.set(0.12 + targetTilt, -0.2 + currentAngle + (motion.matches ? 0 : Math.sin(elapsed * 0.3) * 0.07), -0.075);
       sculpture.position.y = motion.matches ? 0 : Math.sin(elapsed * 0.55) * 0.035;
       root.setAttribute('data-signal-orientation', currentAngle.toFixed(4));
     };
@@ -235,8 +241,8 @@ export default function SignalScene({ className = '' }: { className?: string }) 
         camera.aspect = width / height;
         // Fit the entire W, not a distant default camera. Preserve breathing room on mobile.
         const vFov = THREE.MathUtils.degToRad(camera.fov);
-        const fitWidth = 6.05 / (2 * Math.tan(vFov / 2) * camera.aspect);
-        const fitHeight = 4.45 / (2 * Math.tan(vFov / 2));
+        const fitWidth = 6.65 / (2 * Math.tan(vFov / 2) * camera.aspect);
+        const fitHeight = 4.75 / (2 * Math.tan(vFov / 2));
         camera.position.set(0, 0.42, Math.max(fitWidth, fitHeight));
         camera.lookAt(0, 0.18, 0);
         camera.updateProjectionMatrix();
@@ -253,17 +259,25 @@ export default function SignalScene({ className = '' }: { className?: string }) 
       document.addEventListener('visibilitychange', onVisibility);
       motion.addEventListener('change', onMotion);
       controllerRef.current = {
-        update(nextMode, nextRotation) {
+        update(nextMode, nextRotation, nextTilt, nextZoom) {
           selected = nextMode;
           ribbonGroup.visible = selected === 'ribbon';
           orbitGroup.visible = selected === 'orbit';
-          targetAngle = THREE.MathUtils.degToRad(nextRotation);
+          // Take the shortest turn across the 0/360 boundary.
+          const desired = THREE.MathUtils.degToRad(nextRotation);
+          targetAngle = currentAngle + Math.atan2(Math.sin(desired - currentAngle), Math.cos(desired - currentAngle));
+          targetTilt = THREE.MathUtils.degToRad(nextTilt);
+          camera.zoom = nextZoom;
+          camera.updateProjectionMatrix();
           if (motion.matches) currentAngle = targetAngle;
           renderOnce();
           start();
         },
         reset() {
           elapsed = 0;
+          targetTilt = 0;
+          camera.zoom = 1;
+          camera.updateProjectionMatrix();
           currentAngle = 0;
           targetAngle = 0;
           renderOnce();
@@ -295,12 +309,14 @@ export default function SignalScene({ className = '' }: { className?: string }) 
   }, []);
 
   useEffect(() => {
-    controllerRef.current?.update(mode, rotation);
-  }, [mode, rotation]);
+    controllerRef.current?.update(mode, rotation, tilt, zoom);
+  }, [mode, rotation, tilt, zoom]);
 
   const reset = () => {
     setMode('ribbon');
     setRotation(0);
+    setTilt(0);
+    setZoom(1);
     controllerRef.current?.reset();
   };
 
@@ -310,11 +326,23 @@ export default function SignalScene({ className = '' }: { className?: string }) 
       className={`signal-scene ${className}`.trim()}
       data-signal-mode={mode}
       data-signal-angle={rotation}
+      data-signal-tilt={tilt}
+      data-signal-zoom={zoom}
       data-signal-renderer={rendererState}
       data-signal-running="false"
       aria-label="Wikcia sculptural material study"
     >
-      <div className="signal-scene__stage" ref={mountRef}>
+      <div className="signal-scene__stage" ref={mountRef}
+        role="slider" tabIndex={0} aria-label="Rotate the Wikcia sculpture"
+        aria-valuemin={0} aria-valuemax={359} aria-valuenow={Math.round(rotation) % 360}
+        aria-valuetext={`${Math.round(rotation) % 360} degrees. Use left and right to rotate, up and down to tilt, Home to reset.`}
+        onPointerDown={event => { if (event.button !== 0) return; dragRef.current = { id: event.pointerId, x: event.clientX, y: event.clientY, rotation, tilt }; event.currentTarget.setPointerCapture(event.pointerId); event.currentTarget.dataset.dragging = 'true'; }}
+        onPointerMove={(event: ReactPointerEvent<HTMLDivElement>) => { const drag = dragRef.current; if (!drag || drag.id !== event.pointerId) return; setRotation(turn(drag.rotation + (event.clientX - drag.x) * .55)); setTilt(Math.max(-25, Math.min(25, drag.tilt + (event.clientY - drag.y) * .16))); }}
+        onPointerUp={event => { dragRef.current = null; delete event.currentTarget.dataset.dragging; if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId); }}
+        onPointerCancel={event => { dragRef.current = null; delete event.currentTarget.dataset.dragging; }}
+        onDoubleClick={reset}
+        onKeyDown={event => { if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home'].includes(event.key)) { event.preventDefault(); if (event.key === 'Home') reset(); else if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') setRotation(value => turn(value + (event.key === 'ArrowRight' ? 15 : -15))); else setTilt(value => Math.max(-25, Math.min(25, value + (event.key === 'ArrowDown' ? 5 : -5)))); } }}>
+        <span className="signal-scene__interaction-hint" aria-hidden="true">DRAG TO EXPLORE <span>↔</span></span>
         <svg className="signal-scene__fallback" viewBox="0 0 700 570" fill="none" aria-hidden="true" focusable="false">
           <defs>
             <linearGradient id={`${uid}-ivory`} x1="150" y1="110" x2="510" y2="440" gradientUnits="userSpaceOnUse">
@@ -327,7 +355,7 @@ export default function SignalScene({ className = '' }: { className?: string }) 
             <radialGradient id={`${uid}-shadow`}><stop stopColor="#635d6b" stopOpacity=".2" /><stop offset="1" stopColor="#635d6b" stopOpacity="0" /></radialGradient>
           </defs>
           <ellipse cx="350" cy="470" rx="245" ry="36" fill={`url(#${uid}-shadow)`} />
-          <g transform={`rotate(${rotation * 0.22} 350 285)`}>
+          <g transform={`translate(350 285) scale(${zoom}) rotate(${rotation * 0.22}) skewX(${tilt * .2}) translate(-350 -285)`}>
             {mode === 'ribbon' ? <>
               <path d="M115 153 L196 377 Q217 439 253 374 L340 202 L418 374 Q448 440 484 375 L578 150" stroke={`url(#${uid}-reverse)`} strokeWidth="76" strokeLinecap="butt" strokeLinejoin="round" />
               <path d="M118 141 L200 364 Q217 408 246 354 L336 181 L424 358 Q449 412 479 354 L570 132" stroke={`url(#${uid}-ivory)`} strokeWidth="66" strokeLinecap="butt" strokeLinejoin="round" />
@@ -343,20 +371,23 @@ export default function SignalScene({ className = '' }: { className?: string }) 
         <span className="signal-scene__annotation" aria-hidden="true"><span /> FORM / 0{mode === 'ribbon' ? '1' : '2'}</span>
       </div>
       <figcaption className="signal-scene__caption">
-        <div className="signal-scene__description"><span className="signal-scene__eyebrow">A study in possibility</span><span>One ribbon. Many directions.</span></div>
+        <div className="signal-scene__description"><span className="signal-scene__eyebrow">A study in possibility</span><span>Drag, rotate, change perspective.</span></div>
         <div className="signal-scene__controls" role="group" aria-label="Sculpture controls">
           <div className="signal-scene__modes" role="group" aria-label="Sculpture shape">
             <button type="button" aria-label="Show ribbon sculpture" aria-pressed={mode === 'ribbon'} onClick={() => setMode('ribbon')}>Ribbon</button>
             <button type="button" aria-label="Show orbit sculpture" aria-pressed={mode === 'orbit'} onClick={() => setMode('orbit')}>Orbit</button>
           </div>
-          <button className="signal-scene__icon-button" type="button" aria-label="Rotate sculpture 45 degrees" onClick={() => setRotation(value => value + 45)} title="Rotate sculpture">
+          <button className="signal-scene__icon-button" type="button" aria-label="Rotate sculpture 45 degrees" onClick={() => setRotation(value => turn(value + 45))} title="Rotate sculpture">
             <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M15.9 7.8A6.2 6.2 0 1 0 16 12M16 3.8v4.6h-4.6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </button>
+          <button className="signal-scene__icon-button" type="button" aria-label="Zoom sculpture out" title="Zoom out" disabled={zoom <= .85} onClick={() => setZoom(value => Math.max(.85, Math.round((value - .1) * 100) / 100))}>−</button>
+          <button className="signal-scene__icon-button" type="button" aria-label="Zoom sculpture in" title="Zoom in" disabled={zoom >= 1.2} onClick={() => setZoom(value => Math.min(1.2, Math.round((value + .1) * 100) / 100))}>+</button>
           <button className="signal-scene__icon-button" type="button" aria-label="Reset sculpture" onClick={reset} title="Reset sculpture">
-            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m4.4 8.5 5.6-5 5.6 5M6.5 7v8.5h7V7M9 15.5v-4h2v4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            Reset
           </button>
         </div>
       </figcaption>
+      <p className="signal-scene__instruction">Drag horizontally to turn. Tab + arrow keys also work. Home resets the view.</p>
       <span className="signal-scene__sr-only" role="status" aria-live="polite">{mode === 'ribbon' ? 'Ribbon' : 'Orbit'} sculpture. View rotated {rotation % 360} degrees.{rendererState === 'svg' ? ' Vector study shown.' : ''}</span>
     </figure>
   );

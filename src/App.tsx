@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { SiteHeader, SiteFooter, RouteEffects } from '@/components/SiteChrome';
-import { HomePage } from '@/pages/ExperienceHome';
+import { HomePage } from '@/pages/ProductHome';
 import { AboutPage, ShowcasePage, CapabilitiesPage, ToolkitPage, AppsPage, NotesPage, ArticlePage, FAQPage, ContactPage, NotFound } from '@/pages/ExperiencePages';
 import { notes } from '@/content';
 function Metadata(){const {pathname}=useLocation();useEffect(()=>{const titles:Record<string,string>={'/':'Imagine anything. Make it real.','/about':'Inside Wikcia','/showcase':'Selected work','/skills':'Capabilities','/tools':'The toolkit','/apps':'Studio & CLI','/blog':'Field notes','/faq':'Questions, answered','/contact':'Start a conversation'};const article=notes.find(n=>pathname===`/blog/${n.slug}`);const title=article?.title||titles[pathname]||'Page not found';document.title=`${title} — Wikcia Studio`;const url='https://wikcia-website.vercel.app'+pathname;document.querySelector('link[rel="canonical"]')?.setAttribute('href',url);document.querySelector('meta[property="og:url"]')?.setAttribute('content',url);document.querySelector('meta[property="og:title"]')?.setAttribute('content',document.title);},[pathname]);return null;}
