@@ -24,6 +24,6 @@
     }
   ],
   "rewrites": [
-    { "source": "/", "destination": "/en/" }
+    { "source": "/((?!assets/|fonts/|work/|.*\\.[^/]+$).*)", "destination": "/index.html" }
   ]
 }

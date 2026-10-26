@@ -1,45 +1,9 @@
-import { useState } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
-import { PageTransition } from "@/components/PageTransition";
-import { Locale } from "@/i18n";
-import { HomePage as Home } from "@/pages/Home";
-import { AboutPage as About } from "@/pages/About";
-import { ShowcasePage as Showcase } from "@/pages/Showcase";
-import { SkillsPage as Skills } from "@/pages/Skills";
-import { ToolsPage as Tools } from "@/pages/Tools";
-import { AppsPage as Apps } from "@/pages/Apps";
-import { BlogPage as Blog } from "@/pages/Blog";
-import { FAQPage as FAQ } from "@/pages/FAQ";
-import { ContactPage as Contact } from "@/pages/Contact";
-
-function App() {
-  const [locale] = useState<Locale>("en");
-
-  return (
-    <BrowserRouter>
-      <div className="min-h-screen bg-ink-deep text-porcelain selection:bg-orchid selection:text-ink-deep overflow-x-hidden">
-        <Navbar locale={locale} />
-        <main>
-          <PageTransition locale={locale}>
-            <Routes>
-              <Route path="/" element={<Home locale={locale} />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/showcase" element={<Showcase />} />
-              <Route path="/skills" element={<Skills />} />
-              <Route path="/tools" element={<Tools />} />
-              <Route path="/apps" element={<Apps />} />
-              <Route path="/blog" element={<Blog />} />
-              <Route path="/faq" element={<FAQ />} />
-              <Route path="/contact" element={<Contact />} />
-            </Routes>
-          </PageTransition>
-        </main>
-        <Footer locale={locale} />
-      </div>
-    </BrowserRouter>
-  );
-}
-
-export default App;
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { SiteHeader, SiteFooter, RouteEffects } from '@/components/SiteChrome';
+import { HomePage } from '@/pages/ExperienceHome';
+import { AboutPage, ShowcasePage, CapabilitiesPage, ToolkitPage, AppsPage, NotesPage, ArticlePage, FAQPage, ContactPage, NotFound } from '@/pages/ExperiencePages';
+import { notes } from '@/content';
+function Metadata(){const {pathname}=useLocation();useEffect(()=>{const titles:Record<string,string>={'/':'Imagine anything. Make it real.','/about':'Inside Wikcia','/showcase':'Selected work','/skills':'Capabilities','/tools':'The toolkit','/apps':'Studio & CLI','/blog':'Field notes','/faq':'Questions, answered','/contact':'Start a conversation'};const article=notes.find(n=>pathname===`/blog/${n.slug}`);const title=article?.title||titles[pathname]||'Page not found';document.title=`${title} — Wikcia Studio`;const url='https://wikcia-website.vercel.app'+pathname;document.querySelector('link[rel="canonical"]')?.setAttribute('href',url);document.querySelector('meta[property="og:url"]')?.setAttribute('content',url);document.querySelector('meta[property="og:title"]')?.setAttribute('content',document.title);},[pathname]);return null;}
+function LegacyEnglish(){const location=useLocation();return <Navigate replace to={location.pathname.replace(/^\/en(?=\/|$)/,'')||'/'}/>}
+export default function App(){return <BrowserRouter><Metadata/><RouteEffects/><a className="skip-link" href="#main">Skip to content</a><div id="top"/><SiteHeader/><main id="main"><Routes><Route path="/" element={<HomePage/>}/><Route path="/about" element={<AboutPage/>}/><Route path="/showcase" element={<ShowcasePage/>}/><Route path="/skills" element={<CapabilitiesPage/>}/><Route path="/tools" element={<ToolkitPage/>}/><Route path="/apps" element={<AppsPage/>}/><Route path="/blog" element={<NotesPage/>}/><Route path="/blog/:slug" element={<ArticlePage/>}/><Route path="/faq" element={<FAQPage/>}/><Route path="/contact" element={<ContactPage/>}/><Route path="/en/*" element={<LegacyEnglish/>}/><Route path="*" element={<NotFound/>}/></Routes></main><SiteFooter/></BrowserRouter>}

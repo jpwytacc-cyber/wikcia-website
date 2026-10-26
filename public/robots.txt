@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://wikcia-website.vercel.app/sitemap.xml
