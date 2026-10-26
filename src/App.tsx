@@ -19,12 +19,12 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-ink text-porcelain selection:bg-citron selection:text-ink">
-        <Navbar />
+      <div className="min-h-screen bg-ink-deep text-porcelain selection:bg-orchid selection:text-ink-deep overflow-x-hidden">
+        <Navbar locale={locale} />
         <main>
-          <PageTransition>
+          <PageTransition locale={locale}>
             <Routes>
-              <Route path="/" element={<Home />} />
+              <Route path="/" element={<Home locale={locale} />} />
               <Route path="/about" element={<About />} />
               <Route path="/showcase" element={<Showcase />} />
               <Route path="/skills" element={<Skills />} />

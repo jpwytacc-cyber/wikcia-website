@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -6,28 +6,29 @@ gsap.registerPlugin(ScrollTrigger);
 
 interface PageTransitionProps {
   children: React.ReactNode;
+  locale: string;
 }
 
-export function PageTransition({ children }: PageTransitionProps) {
+export function PageTransition({ children, locale }: PageTransitionProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const tl = gsap.timeline();
     tl.fromTo(
-      "[data-animate]",
+      "[data-page-animate]",
       { y: 40, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.6, stagger: 0.08, ease: "power3.out" },
-      0.1
+      { y: 0, opacity: 1, duration: 0.7, stagger: 0.06, ease: "power4.out" },
+      0.05
     );
     setMounted(true);
 
     return () => {
       ScrollTrigger.getAll().forEach((t) => t.kill());
     };
-  }, []);
+  }, [locale]);
 
   return (
-    <div className="min-h-screen" data-animate>
+    <div className="min-h-screen overflow-hidden" data-page-animate>
       {mounted ? children : null}
     </div>
   );
@@ -38,15 +39,15 @@ export function useScrollReveal(ref: React.RefObject<HTMLElement>, options = {})
     if (!ref.current) return;
     const tween = gsap.fromTo(
       ref.current,
-      { y: 30, opacity: 0 },
+      { y: 50, opacity: 0 },
       {
         y: 0,
         opacity: 1,
-        duration: 0.8,
+        duration: 0.9,
         ease: "power3.out",
         scrollTrigger: {
           trigger: ref.current,
-          start: "top bottom-=100",
+          start: "top 82%",
           once: true,
         },
       }
