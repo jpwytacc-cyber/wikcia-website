@@ -1,0 +1,3 @@
+# Wikcia sales enquiries
+
+Cloudflare Worker `wikcia-sales-leads`, hostname `leads.wikcia.com`, D1 `wikcia-sales-leads` (EU). Only POST from the approved Wikcia website origins; no public read endpoint. Check incoming leads in Cloudflare D1 Studio. No email notification is configured. Do not expose credentials or export personal data to source control. Review records and remove them when no longer needed. Schema: leads(id, created_at, name, email, company, interest, message, status, notice_version).

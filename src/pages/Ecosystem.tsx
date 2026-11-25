@@ -16,7 +16,7 @@ const services=[
  ['04','Growth & creative technology','Brand systems, conversion journeys, outreach preparation, motion and interactive design.']
 ];
 
-function ConceptVisual({id}:{id:string}){const symbols:Record<string,string>={studio:'✳',cli:'>_',referrals:'↗',one:'01'};return <div className={'fv3-product-symbol fv3-symbol-'+id} aria-hidden="true">{symbols[id]}</div>}
+function ConceptVisual({id}:{id:string}){return <div className={'fv3-product-symbol fv3-symbol-'+id}><img src="/logo.png" width={66} height={66} alt="" loading="lazy"/></div>}
 export function Ecosystem({full=false}:{full?:boolean}){
  const [filter,setFilter]=useState('All');
  const filters=['All','AI workspace','Developer tools','Growth software','Business infrastructure'];
