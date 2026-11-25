@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Arrow } from '@/components/SiteChrome';
 import { ProjectPreview } from './ExperienceHome';
+import { projects } from '@/content';
 import { ProductIntroduction, ProductTour } from '@/experience/ProductShowcase';
 import { Workbench } from '@/experience/Workbench';
 import { Ecosystem, ServicesBand, Roadmap } from './Ecosystem';
@@ -24,8 +25,8 @@ export function HomePage(){
   <ProductIntroduction/>
   <ProductTour/>
   <section className="selected-section section-pad" id="selected-work">
-   <div className="section-heading"><span className="eyebrow">03 / THE KIND OF WORK WE MAKE</span><div className="heading-row"><h2>Different worlds.<br/>The same care.</h2><div><p>A visual look at what design and engineering can bring together. Actual sites from the Love & Pixels universe—not anonymous stock placeholders.</p><Link className="text-link" to="/showcase">Explore all selected work <Arrow/></Link></div></div></div>
-   <div className="project-grid"><ProjectPreview index={0} large/><ProjectPreview index={1}/><ProjectPreview index={2}/></div>
+   <div className="section-heading"><span className="eyebrow">03 / THE KIND OF WORK WE MAKE</span><div className="heading-row"><h2>Our work.<br/>Built to be explored.</h2><div><p>A visual look at what design and engineering can bring together. Explore our own software, client engineering and interactive digital concepts. Every website card links to a real interface and uses an authentic capture.</p><Link className="text-link" to="/showcase">Explore all selected work <Arrow/></Link></div></div></div>
+   <div className="project-grid">{[3,4,5,0,1,6,2].filter(i=>projects[i]).map((i,n)=><ProjectPreview key={projects[i].id} index={i} large={n===0}/>)}</div>
   </section>
   <ServicesBand/>
   <section className="playground-section section-pad" id="playground">
