@@ -14,6 +14,16 @@ export function BlogPage() {
             </p>
           </div>
 
+          <aside className="card p-8 mb-10" aria-labelledby="evaluation-resources">
+            <h3 id="evaluation-resources" className="text-xl font-display font-bold text-porcelain mb-3">Free AI evaluation resources</h3>
+            <p className="text-silver-400 text-sm leading-relaxed mb-5">Compare model providers using repeated tasks, documented acceptance criteria and total cost per successful result. Love &amp; Pixels offers free guides and a calculator for your own observed test results.</p>
+            <ul className="space-y-3 text-sm text-citron">
+              <li><a className="underline underline-offset-4" href="https://byloveandpixels.com/en/insights/how-to-benchmark-llms-reliably">How to benchmark LLMs reliably</a></li>
+              <li><a className="underline underline-offset-4" href="https://byloveandpixels.com/en/tools/llm-benchmark-lab">Free LLM benchmark comparison tool</a></li>
+              <li><a className="underline underline-offset-4" href="https://byloveandpixels.com/en/insights/local-llms-or-cloud-ai">Choosing local or cloud AI</a></li>
+            </ul>
+          </aside>
+
           <div className="grid md:grid-cols-3 gap-8">
             {blogPosts.map((post) => (
               <article key={post.id} className="card p-8 group">
